@@ -2,22 +2,23 @@ use serde::{Deserialize, Serialize};
 use crate::model::account_meta::AccountMeta;
 
 #[derive(Debug, Deserialize)]
-pub struct CreateTokenRequest {
-    pub mint_authority: String,
+pub struct SendTokenRequest {
+    pub destination: String,
     pub mint: String,
-    pub decimals: u8,
+    pub owner: String,
+    pub amount: u64,
 }
 
 #[derive(Debug, Serialize)]
-pub struct CreateTokenResponse {
+pub struct SendTokenResponse {
     pub success: bool,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub error: Option<String>,
-    pub data: CreateTokenData,
+    pub data: Option<SendTokenData>,
 }
 
 #[derive(Debug, Serialize)]
-pub struct CreateTokenData {
+pub struct SendTokenData {
     pub program_id: String,
     pub accounts: Vec<AccountMeta>,
     pub instruction_data: String,

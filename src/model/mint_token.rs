@@ -12,6 +12,8 @@ pub struct MintTokenRequest {
 #[derive(Debug, Serialize)]
 pub struct MintTokenResponse {
     pub success: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub error: Option<String>,
     pub data: MintTokenData,
 }
 

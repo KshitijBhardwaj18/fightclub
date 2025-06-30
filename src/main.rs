@@ -1,57 +1,68 @@
 use axum::{
     http::Method,
-    routing::{ post},
+    routing::post,
     Router,
 };
 use dotenv::dotenv;
-// use service::solana_service::{get_balance, get_sols, transact_sol};
 use tower_http::cors::{Any, CorsLayer};
 use tracing_subscriber;
-use routes::generate_keypair::generate_keypair;
-use routes::create_token::create_token;
-use routes::mint_token::mint_token;
-use routes::sign_message::sign_message;
-mod model;
-mod routes;
 
+// Import route handlers
+use routes::{
+    create_token::create_token,
+    generate_keypair::generate_keypair,
+    mint_token::mint_token,
+    sign_message::sign_message,
+    verify_message::verify_message,
+    send_sol::send_sol,
+    send_token::send_token,
+};
+
+// Module declarations
+pub mod error;
+pub mod model;
+pub mod routes;
 
 #[tokio::main]
 async fn main() {
+    // Initialize environment variables and logging
     dotenv().ok();
     tracing_subscriber::fmt::init();
 
+    // Configure CORS
     let cors = CorsLayer::new()
-        // allow `GET` and `POST` when accessing the resource
         .allow_methods([Method::GET, Method::POST])
         .allow_headers(Any)
-        // allow requests from any origin
         .allow_origin(Any);
 
-    // build our application with a single route
+    // Build application with all routes
     let app = Router::new()
-        .route(
-            "/keypair",
-            post(generate_keypair),
-        )
-        .route(
-            "/token/create",
-            post(create_token),
-        )
-        .route(
-            "/token/mint",
-            post(mint_token),
-        ).route(
-            "/message/sign",
-            post(sign_message),
-        )
+        // Keypair generation
+        .route("/keypair", post(generate_keypair))
+        
+        // Token operations
+        .route("/token/create", post(create_token))
+        .route("/token/mint", post(mint_token))
+        
+        // Message signing/verification
+        .route("/message/sign", post(sign_message))
+        .route("/message/verify", post(verify_message))
+        
+        // Transfer operations
+        .route("/send/sol", post(send_sol))
+        .route("/send/token", post(send_token))
+        
+        // Add CORS layer
         .layer(cors);
 
-    // run our app with hyper, listening globally on port 3000
+    // Start server
     let listener = tokio::net::TcpListener::bind("127.0.0.1:3000")
         .await
         .unwrap();
 
     println!("🚀 Server listening on http://127.0.0.1:3000");
 
-    axum::serve(listener, app).await.unwrap();
+    axum::serve(listener, app)
+        .await
+        .unwrap();
 }
