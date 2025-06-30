@@ -10,7 +10,7 @@ use crate::{
 pub async fn sign_message(
     Json(request): Json<SignMessageRequest>,
 ) -> Result<Json<SignMessageResponse>, AppError> {
-    // Validate required fields
+  
     if request.message.is_empty() || request.secret.is_empty() {
         return Err(AppError::new(
             "Missing required fields: both message and secret must be provided",
@@ -18,7 +18,7 @@ pub async fn sign_message(
         ));
     }
 
-    // Decode the secret key from base58
+  
     let secret_bytes = bs58::decode(&request.secret)
         .into_vec()
         .map_err(|_| AppError::new(
@@ -26,14 +26,14 @@ pub async fn sign_message(
             StatusCode::BAD_REQUEST,
         ))?;
 
-    // Create keypair from secret
+   
     let keypair = Keypair::from_bytes(&secret_bytes)
         .map_err(|_| AppError::new(
             "Invalid secret key: failed to create keypair",
             StatusCode::BAD_REQUEST,
         ))?;
 
-    // Sign the message
+   
     let signature = keypair.sign_message(request.message.as_bytes());
     let signature_base64 = general_purpose::STANDARD.encode(signature.as_ref());
 

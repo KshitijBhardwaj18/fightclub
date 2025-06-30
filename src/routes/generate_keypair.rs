@@ -10,7 +10,7 @@ pub async fn generate_keypair() -> Result<Json<GenerateKeypairResponse>, AppErro
     let keypair = Keypair::new();
     let pubkey = keypair.pubkey().to_string();
     
-    // This is the fixed part - directly convert to string
+  
     let secret = bs58::encode(keypair.to_bytes()).into_string();
     
     Ok(Json(GenerateKeypairResponse { 

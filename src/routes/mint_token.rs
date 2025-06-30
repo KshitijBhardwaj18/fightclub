@@ -14,7 +14,7 @@ use crate::{
 pub async fn mint_token(
     Json(request): Json<MintTokenRequest>,
 ) -> Result<Json<MintTokenResponse>, AppError> {
-    // Validate amount
+    
     if request.amount == 0 {
         return Err(AppError::new(
             "Amount must be greater than 0",
@@ -22,7 +22,7 @@ pub async fn mint_token(
         ));
     }
 
-    // Parse pubkeys with proper error handling
+  
     let mint = Pubkey::from_str(&request.mint)
         .map_err(|_| AppError::new(
             "Invalid mint address format",
@@ -41,7 +41,7 @@ pub async fn mint_token(
             StatusCode::BAD_REQUEST,
         ))?;
 
-    // Create mint instruction
+    
     let mint_ix = mint_to(
         &spl_token::id(),
         &mint,
@@ -54,7 +54,7 @@ pub async fn mint_token(
         StatusCode::BAD_REQUEST,
     ))?;
 
-    // Convert accounts
+    
     let accounts = mint_ix.accounts.iter().map(|meta| {
         ResponseAccountMeta {
             pubkey: meta.pubkey.to_string(),

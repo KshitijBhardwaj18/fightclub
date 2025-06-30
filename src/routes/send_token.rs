@@ -9,7 +9,7 @@ use crate::model::account_meta::AccountMeta;
 pub async fn send_token(
     Json(request): Json<SendTokenRequest>,
 ) -> Result<Json<SendTokenResponse>, AppError> {
-    // Validate inputs
+    
     if request.amount == 0 {
         return Err(AppError::new(
             "Amount must be greater than 0",
@@ -35,12 +35,11 @@ pub async fn send_token(
             StatusCode::BAD_REQUEST,
         ))?;
 
-    // Create transfer instruction
     let transfer_ix = transfer(
         &spl_token::id(),
         &source,
         &destination,
-        &source, // Using owner as authority
+        &source, 
         &[],
         request.amount,
     ).map_err(|e| AppError::new(
@@ -48,7 +47,6 @@ pub async fn send_token(
         StatusCode::BAD_REQUEST,
     ))?;
 
-    // Convert accounts to response format
     let accounts = transfer_ix.accounts.iter().map(|meta| {
         AccountMeta {
             pubkey: meta.pubkey.to_string(),

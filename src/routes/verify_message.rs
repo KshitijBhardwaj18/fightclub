@@ -8,7 +8,7 @@ use std::str::FromStr;
 pub async fn verify_message(
     Json(request): Json<VerifyMessageRequest>,
 ) -> Result<Json<VerifyMessageResponse>, AppError> {
-    // Validate inputs
+   
     if request.message.is_empty() || request.signature.is_empty() || request.pubkey.is_empty() {
         return Err(AppError::new(
             "Missing required fields: message, signature, and pubkey must be provided",
@@ -16,14 +16,13 @@ pub async fn verify_message(
         ));
     }
 
-    // Decode pubkey
+   
     let pubkey = Pubkey::from_str(&request.pubkey)
         .map_err(|_| AppError::new(
             "Invalid public key format",
             StatusCode::BAD_REQUEST,
         ))?;
 
-    // Decode signature
     let signature_bytes = general_purpose::STANDARD.decode(&request.signature)
         .map_err(|_| AppError::new(
             "Invalid signature format: must be base64 encoded",
@@ -36,7 +35,7 @@ pub async fn verify_message(
             StatusCode::BAD_REQUEST,
         ))?;
 
-    // Verify signature
+   
     let valid = signature.verify(&pubkey.to_bytes(), request.message.as_bytes());
 
     Ok(Json(VerifyMessageResponse {

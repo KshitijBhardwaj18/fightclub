@@ -11,7 +11,7 @@ use crate::model::account_meta::AccountMeta;
 pub async fn send_sol(
     Json(request): Json<SendSolRequest>,
 ) -> Result<Json<SendSolResponse>, AppError> {
-    // Validate inputs
+ 
     if request.lamports == 0 {
         return Err(AppError::new(
             "Lamports must be greater than 0",
@@ -31,14 +31,14 @@ pub async fn send_sol(
             StatusCode::BAD_REQUEST,
         ))?;
 
-    // Create transfer instruction
+    
     let transfer_ix = system_instruction::transfer(
         &from_pubkey,
         &to_pubkey,
         request.lamports,
     );
 
-    // Convert accounts to response format
+    
     let accounts = transfer_ix.accounts.iter().map(|meta| {
         AccountMeta {
             pubkey: meta.pubkey.to_string(),
